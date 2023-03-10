@@ -1,0 +1,13 @@
+on:
+  push:
+    paths:
+      - '**/*.rs'
+
+jobs:
+  echo_a_thing:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          echo "Checking rust files."

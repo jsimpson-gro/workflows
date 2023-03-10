@@ -1,7 +1,7 @@
 on:
   push:
     paths:
-      - **/*.rs
+      - '**/*.py'
 
 jobs:
   echo_a_thing:
@@ -10,4 +10,4 @@ jobs:
       - env:
           ISSUE_URL: ${{ github.event.issue.html_url }}
         run: |
-          echo "Doing something. $ISSUE_URL"
+          echo "Checking rust files."
