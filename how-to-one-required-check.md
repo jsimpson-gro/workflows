@@ -32,8 +32,7 @@ And 6 more that execute selectively based on the paths in the PR:
 - ['Check' Rust files](.github/workflows/check-rust-files.yml)
 - ['Check' SQL files](.github/workflows/check-sql-files.yml)
 
-Only the first is required.
-
+Example PRs:
 - A [PR](https://github.com/jsimpson-gro/workflows/pull/10) with both Rust and Python changes. The Python check is failing, so
   the 'Check checks' is failing, so the merge is blocked.
 - A [PR](https://github.com/jsimpson-gro/workflows/pull/14) with a successful SQL change.
