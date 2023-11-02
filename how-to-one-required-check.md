@@ -1,6 +1,8 @@
 # How-to for a single required check
 
 The Github guidance for [handling skipped but required checks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks#handling-skipped-but-required-checks) is really not helpful.
+And previously was [different](https://github.com/github/docs/issues/8926),
+advocating for pairs of jobs when there was path restrictions.
 
 A different mechanism is to have _only_ one required check. It's purpose is to
 confirm that the other checks on the PR were successful.
@@ -15,12 +17,14 @@ confirm that the other checks on the PR were successful.
     ![Protect Matching Branches](protect-matching-branches.png)
 
 3. Other checks in the repo can use the [usual filtering mechanisms](https://github.com/jsimpson-gro/workflows/blob/8782a01cbe908b0fdeea4d88ee9f3707ebe39916/.github/workflows/check-rust-files.yml#L3-L4) to execute
-   selectively against the PRs where they have meaning.
+   selectively against the PRs where they have value.
 
 ## Examples
 
-This repository has 7 workflows:
+This repository has 7 workflows. One that is `required`:
 - [Check the checks](.github/workflows/check-checks.yml) - the only `Required` check.
+
+And 6 more that execute selectively based on the paths in the PR:
 - ['Check' Bash files](.github/workflows/check-bash-files.yml)
 - ['Check' Go files](.github/workflows/check-go-files.yml)
 - ['Check' Java files](.github/workflows/check-java-files.yml)
