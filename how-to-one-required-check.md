@@ -19,7 +19,7 @@ confirm that the other checks on the PR were successful.
 
 ## Examples
 
-This repository has 3 workflows:
+This repository has 7 workflows:
 - [Check the checks](.github/workflows/check-checks.yml) - the only `Required` check.
 - ['Check' Bash files](.github/workflows/check-bash-files.yml)
 - ['Check' Go files](.github/workflows/check-go-files.yml)
