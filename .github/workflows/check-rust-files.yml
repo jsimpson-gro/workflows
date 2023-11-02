@@ -4,7 +4,7 @@ on:
       - '**/*.rs'
 
 jobs:
-  echo_a_thing:
+  rust_merge_check:
     runs-on: ubuntu-latest
     steps:
       - env:
