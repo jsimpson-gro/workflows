@@ -1,0 +1,7 @@
+jobs:
+  check_checks:
+    name: Check for failing checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call a Bash Script
+        run: bash ${GITHUB_WORKSPACE}/.github/workflows/wait_suite_complete.sh
