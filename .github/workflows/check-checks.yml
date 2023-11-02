@@ -10,10 +10,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Call a Bash Script
+      - name: Check Github API for successful completion of all checks.
         run: |
-          # export
+          #
+          # The essential information in the Github API for determining if all
+          # checks on the PR have passed is contained in two APIs. The "check
+          # suites" API lists all the things that execute against the PR, the
+          # "check runs" API lists the execution status (success/fail) of the
+          # check suites.
+          #
 
+          #
+          # Get a list of all the "check suites" for this PR. It seems like each
+          # thing in the list of PR status checks is it's own "check suite".
+          #
           echo "Requesting check suites for ${GITHUB_SHA}."
           response=$(curl -L -s \
             -H "Accept: application/vnd.github+json" \
@@ -23,6 +33,13 @@ jobs:
 
           suite_ids=$(echo "${response}" | jq -r '.check_suites[].id' | tr '\n' ' ')
 
+          #
+          # As long as the check runs have not completed yet (which can be
+          # determined from the `.status` field), keep checking. There is a
+          # counter to provide a timeout on this script. It should probably be
+          # much higher than 10 seconds, however for this demonstration that is
+          # sufficient.
+          #
           i=0
           while true ; do
               i=$(( i + 1 ))
@@ -33,6 +50,7 @@ jobs:
                   return 1
               fi
 
+              # Get the complete list of check runs for all the check suites.
               other_checks=""
               for suite_id in $(echo ${suite_ids}); do
                   echo "Requesting check run for check suite ${suite_id} information from Github."
@@ -46,20 +64,33 @@ jobs:
                   response=$(echo "$response" | jq '.check_runs')
                   other_checks=$(echo "$other_checks $response" | jq -s 'map(.[])')
               done
+
+              # Filter out this check. If this check is the only check that
+              # applies to this PR, then success.
               other_checks=$(echo $other_checks \
                   | jq '. | map(select(.name != "Check for failing checks"))')
 
+
+              # Confirm that there are other checks running against this PR. If
+              # there are no other checks for this PR, then all done, success.
               count_other_checks=$(echo $other_checks | jq 'length')
               if [[ $count_other_checks -eq 0 ]]; then
                   echo "No other checks are gating this PR."
                   exit 0
               fi
 
+              # Count how many checks are not yet complete. If there are any
+              # checks not yet complete, jump back to the top of the loop and
+              # try again after a little sleep.
               count_incomplete_checks=$(echo $other_checks | jq 'map(select(.status != "completed")) | length')
               if [[ $count_incomplete_checks -ne 0 ]]; then
                   continue
               fi
 
+              # Once all the checks have completed, count how many check runs
+              # concluded unsuccessfully. For a bash script, exit 0 is success,
+              # anything else is fail, so return the count of unsuccessful. 0
+              # unsuccessful means good to go.
               echo "All check runs have completed in this suite."
               count_unsuccessful_checks=$(echo $other_checks | jq 'map(select(.conclusion != "success")) | length')
               exit $count_unsuccessful_checks
